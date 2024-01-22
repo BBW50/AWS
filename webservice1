@@ -1,0 +1,129 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CloudFormation template for creating a multi-AZ, multi-VPC environment with ALB and EC2 instance.",
+    "Resources": {
+        "ProductionVPC": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "10.0.0.0/16",
+                "EnableDnsSupport": "true",
+                "EnableDnsHostnames": "true",
+                "Tags": [{"Key": "Name", "Value": "ProductionVPC"}]
+            }
+        },
+        "ProductionPublicSubneta": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "ProductionVPC"},
+                "CidrBlock": "10.0.1.0/24",
+                "AvailabilityZone": "ap-northeast-1a",
+                "MapPublicIpOnLaunch": true,
+                "Tags": [{"Key": "Name", "Value": "ProductionPublicSubneta"}]
+            }
+        },
+        "ProductionPublicSubnetc": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "ProductionVPC"},
+                "CidrBlock": "10.0.2.0/24",
+                "AvailabilityZone": "ap-northeast-1c",
+                "MapPublicIpOnLaunch": true,
+                "Tags": [{"Key": "Name", "Value": "ProductionPublicSubnetc"}]
+            }
+        },
+        "ProductionPrivateSubneta": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "ProductionVPC"},
+                "CidrBlock": "10.0.3.0/24",
+                "AvailabilityZone": "ap-northeast-1a",
+                "MapPublicIpOnLaunch": false,
+                "Tags": [{"Key": "Name", "Value": "ProductionPrivateSubneta"}]
+            }
+        },
+        "ProductionPrivateSubnetc": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "ProductionVPC"},
+                "CidrBlock": "10.0.4.0/24",
+                "AvailabilityZone": "ap-northeast-1c",
+                "MapPublicIpOnLaunch": false,
+                "Tags": [{"Key": "Name", "Value": "ProductionPrivateSubnetc"}]
+            }
+        },
+        "ApplicationLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Type": "application",
+                "Subnets": [
+                    {"Ref": "ProductionPublicSubneta"},
+                    {"Ref": "ProductionPublicSubnetc"}
+                ]
+                // Additional ALB properties would be defined here
+            }
+        },
+        "EC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                // EC2 instance properties would be defined here
+            }
+        },
+        "RDSInstance": {
+            "Type": "AWS::RDS::DBInstance",
+            "Properties": {
+                // RDS instance properties would be defined here
+            }
+        },
+        "PublicSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                // Security group properties would be defined here
+            }
+        },
+        "PrivateSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                // Security group properties would be defined here
+            }
+        },
+        "CloudFrontDistribution": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Properties": {
+                "DistributionConfig": {
+                    "Enabled": true
+                    // Additional CloudFront properties would be defined here
+                }
+            }
+        },
+        "Route53HostedZone": {
+            "Type": "AWS::Route53::HostedZone",
+            "Properties": {
+                "Name": "example.com"
+            }
+        },
+        "Route53RecordSet": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "HostedZoneId": {"Ref": "Route53HostedZone"},
+                "Name": "www.example.com",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": {"Fn::GetAtt": ["CloudFrontDistribution", "DomainName"]}
+                }
+            }
+        },
+        "S3Bucket1": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": "example-prod-log-123456789012"
+            }
+        },
+        "S3Bucket2": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": "example-dev-contents-123456789012"
+            }
+        }
+    }
+}
