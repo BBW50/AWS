@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  AdministratorsGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: "Administrators"
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AdministratorAccess"
+        - "arn:aws:iam::aws:policy/job-function/Billing"
+
+  InfraAdminsGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: "InfraAdmins"
+      Path: "/"
+      Policies:
+        - PolicyName: "InfraAdminsPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "ec2:*"
+                  - "rds:*"
+                  - "s3:*"
+                Resource: "*"
+
+  SecurityAdminsGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: "SecurityAdmins"
+      Path: "/"
+      Policies:
+        - PolicyName: "SecurityAdminsPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "cloudwatch:*"
+                  - "logs:*"
+                Resource: "*"
+
+  UserAAA:
+    Type: "AWS::IAM::User"
+    Properties:
+      UserName: "AAA"
+      Groups:
+        - "InfraAdmins"
+        - "SecurityAdmins"
+      LoginProfile:
+        Password: "nitialpassword1A!"
+        PasswordResetRequired: true
+
+  UserBBB:
+    Type: "AWS::IAM::User"
+    Properties:
+      UserName: "BBB"
+      Groups:
+        - "InfraAdmins"
+        - "SecurityAdmins"
+      LoginProfile:
+        Password: "nitialpassword1B!"
+        PasswordResetRequired: true
+
+  UserCCC:
+    Type: "AWS::IAM::User"
+    Properties:
+      UserName: "CCC"
+      Groups:
+        - "Administrators"
+      LoginProfile:
+        Password: "initialpassword1A!"
+        PasswordResetRequired: true
