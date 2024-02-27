@@ -61,7 +61,7 @@ Resources:
         - "InfraAdmins"
         - "SecurityAdmins"
       LoginProfile:
-        Password: "nitialpassword1B!"
+        Password: "nitialpassword1A!"
         PasswordResetRequired: true
 
   UserCCC:
@@ -71,5 +71,5 @@ Resources:
       Groups:
         - "Administrators"
       LoginProfile:
-        Password: "initialpassword1A!"
+        Password: "nitialpassword1A!"
         PasswordResetRequired: true
